@@ -1,0 +1,47 @@
+name: Build Android APK (بناء تطبيق رسائلي تلقائياً)
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch: # يتيح لك الضغط على زر "Run workflow" يدوياً في أي وقت
+
+jobs:
+  build:
+    name: Build Debug APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 1. تنزيل كود المشروع (Checkout Repository)
+        uses: actions/checkout@v4
+
+      - name: 2. إعداد بيئة جافا (Set up JDK 17)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: 3. إعداد أدوات أندرويد (Set up Android SDK)
+        uses: android-actions/setup-android@v3
+
+      - name: 4. منح صلاحية التنفيذ لـ Gradle Wrapper
+        run: |
+          chmod +x gradlew || true
+
+      - name: 5. تجميع وبناء ملف APK (Assemble Debug APK)
+        run: |
+          if [ -f "gradlew" ] && [ -f "gradle/wrapper/gradle-wrapper.jar" ]; then
+            ./gradlew assembleDebug --stacktrace
+          else
+            gradle assembleDebug --stacktrace
+          fi
+
+      - name: 6. رفع ملف الـ APK الجاهز للتحميل (Upload APK Artifact)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Rasayili-SMS-Debug-APK
+          path: app/build/outputs/apk/debug/*.apk
+          retention-days: 30
+          if-no-files-found: error

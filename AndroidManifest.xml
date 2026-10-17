@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.rasayili.sms">
+
+    <!-- أذونات الرسائل القصيرة والاتصال الخلوي (بدون أي إذن إنترنت لحماية الخصوصية المطلقة) -->
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.RECEIVE_MMS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <uses-feature
+        android:name="android.hardware.telephony"
+        android:required="false" />
+
+    <application
+        android:name=".RasayiliApp"
+        android:allowBackup="true"
+        android:icon="@android:drawable/sym_action_chat"
+        android:label="رسائلي"
+        android:roundIcon="@android:drawable/sym_action_chat"
+        android:supportsRtl="true"
+        android:theme="@android:style/Theme.Material.Light.NoActionBar"
+        tools:targetApi="35">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="رسائلي"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <action android:name="android.intent.action.SENDTO" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="sms" />
+                <data android:scheme="smsto" />
+                <data android:scheme="mms" />
+                <data android:scheme="mmsto" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".ui.ComposeSmsActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.SENDTO" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="sms" />
+                <data android:scheme="smsto" />
+                <data android:scheme="mms" />
+                <data android:scheme="mmsto" />
+            </intent-filter>
+        </activity>
+
+        <receiver
+            android:name=".receiver.SmsReceiver"
+            android:exported="true"
+            android:permission="android.permission.BROADCAST_SMS">
+            <intent-filter android:priority="999">
+                <action android:name="android.provider.Telephony.SMS_DELIVER" />
+            </intent-filter>
+            <intent-filter android:priority="999">
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".receiver.MmsReceiver"
+            android:exported="true"
+            android:permission="android.permission.BROADCAST_WAP_PUSH">
+            <intent-filter>
+                <action android:name="android.provider.Telephony.WAP_PUSH_DELIVER" />
+                <data android:mimeType="application/vnd.wap.mms-message" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".service.HeadlessSmsSendService"
+            android:exported="true"
+            android:permission="android.permission.SEND_RESPOND_VIA_MESSAGE">
+            <intent-filter>
+                <action android:name="android.intent.action.RESPOND_VIA_MESSAGE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="sms" />
+                <data android:scheme="smsto" />
+                <data android:scheme="mms" />
+                <data android:scheme="mmsto" />
+            </intent-filter>
+        </service>
+
+    </application>
+
+</manifest>
